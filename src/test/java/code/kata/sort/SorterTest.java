@@ -1,9 +1,13 @@
 package code.kata.sort;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class SorterTest {
     @Test
@@ -14,62 +18,85 @@ public class SorterTest {
 
     @Test
     public void testEmptySort() {
-        Sorter sorter = new Sorter();
-        int[] input = new int[0];
-        int[] result = sorter.sort(input);
+        Sorter<Integer> sorter = new Sorter();
+        Integer[] input = new Integer[0];
+        Integer[] result = sorter.sort(input);
         assertArraysEqual(result, input);
     }
 
     @Test
     public void testSingleElementSort() {
-        Sorter sorter = new Sorter();
-        int[] input = new int[]{1};
-        int[] result = sorter.sort(input);
+        Sorter<Integer> sorter = new Sorter();
+        Integer[] input = new Integer[]{1};
+        Integer[] result = sorter.sort(input);
         assertArraysEqual(result, input);
     }
 
     @Test
     public void testTwoElementSort() {
-        Sorter sorter = new Sorter();
-        int[] input = new int[]{2,1};
-        int[] result = new int[]{1,2};
+        Sorter<Integer> sorter = new Sorter();
+        Integer[] input = new Integer[]{2,1};
+        Integer[] result = new Integer[]{1,2};
         assertArraysEqual(result, sorter.sort(input));
     }
 
     @Test
     public void testMultipleElementsSort() {
-        Sorter sorter = new Sorter();
+        Sorter<Integer> sorter = new Sorter();
         //List<Integer> input = new Random().ints(10).boxed().collect(Collectors.toList());
-        int input[] = new Random().ints(10).toArray();
-        int[] result = sorter.sort(input);
-        for(int i = 0 ; i < result.length - 1 ; i++) {
-            Assert.assertTrue(result[i] <= result[i+1]);
-        }
+        int[] array = new Random().ints(10).toArray();
+        Integer[] input = Arrays.stream(array).boxed().toArray(Integer[]::new);
+        Integer[] result = sorter.sort(input);
+        assertArraySorted(result);
     }
 
     @Test
     public void testLargeNumberOfElementsSort() {
-        Sorter sorter = new Sorter();
+        Sorter<Integer> sorter = new Sorter();
         //List<Integer> input = new Random().ints(10).boxed().collect(Collectors.toList());
-        int input[] = new Random().ints(50000).toArray();
-        int[] result = sorter.sort(input);
-        for(int i = 0 ; i < result.length - 1 ; i++) {
-            Assert.assertTrue(result[i] <= result[i+1]);
-        }
+        int array[] = new Random().ints(50000).toArray();
+        Integer[] input = Arrays.stream(array).boxed().toArray(Integer[]::new);
+        Integer[] result = sorter.sort(input);
+        assertArraySorted(result);
     }
 
     @Test
     public void testVeryLargeNumberOfElementsSort() {
-        Sorter sorter = new Sorter();
+        Sorter<Integer> sorter = new Sorter();
         //List<Integer> input = new Random().ints(10).boxed().collect(Collectors.toList());
-        int input[] = new Random().ints(1000 * 1000).toArray();
-        int[] result = sorter.sort(input);
-        for(int i = 0 ; i < result.length - 1 ; i++) {
-            Assert.assertTrue(result[i] <= result[i+1]);
-        }
+        int array[] = new Random().ints(1000 * 1000).toArray();
+        Integer[] input = Arrays.stream(array).boxed().toArray(Integer[]::new);
+        Integer[] result = sorter.sort(input);
+        assertArraySorted(result);
     }
 
-    private void assertArraysEqual(int[] expected, int[] actual) {
+    @Test
+    public void testStringSorting() {
+        Sorter<String> sorter = new Sorter<>();
+        Object[] array = new Random()
+                .ints(1, 10)
+                .limit(10)
+                .mapToObj(e -> RandomStringUtils.randomAlphanumeric(e))
+                .toArray();
+        String[] input = Arrays.stream(array).toArray(String[]::new);
+        String[] result = sorter.sort(input);
+        assertArraySorted(result);
+    }
+
+    @Test
+    public void testStringSortingForLargeInput() {
+        Sorter<String> sorter = new Sorter<>();
+        Object[] array = new Random()
+                .ints(1, 10)
+                .limit(1000)
+                .mapToObj(e -> RandomStringUtils.randomAlphanumeric(e))
+                .toArray();
+        String[] input = Arrays.stream(array).toArray(String[]::new);
+        String[] result = sorter.sort(input);
+        assertArraySorted(result);
+    }
+
+    private void assertArraysEqual(Object[] expected, Object[] actual) {
         if(expected == null && actual == null) {
             return;
         }
@@ -85,5 +112,21 @@ public class SorterTest {
         for(int i = 0 ; i < expected.length ; i++) {
             Assert.assertEquals(expected[i], actual[i]);
         }
+    }
+
+    private <T extends Comparable<T>> boolean assertArraySorted(T[] array) {
+        if(array == null) {
+            return true;
+        }
+        if(array.length == 0 || array.length == 1) {
+            return true;
+        }
+        for(int i = 0 ; i < array.length - 1 ; i++) {
+            if(array[i].compareTo(array[i+1]) <= 0) {
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 }

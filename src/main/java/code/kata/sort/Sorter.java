@@ -1,29 +1,28 @@
 package code.kata.sort;
 
-public class Sorter {
-    public int[] sort(int[] input) {
+public class Sorter<T extends Comparable<T>> {
+    public T[] sort(T[] input) {
         if(input == null) {
             return null;
         } else if(input.length == 0 || input.length == 1) {
             return input;
         } else return sort(input, 0, input.length - 1);
     }
-    private int[] sort(int[] input, int start, int end) {
+    private T[] sort(T[] input, int start, int end) {
          if(input.length == 2) {
-            if(input[0] <= input[1]) {
+             if(input[0].compareTo(input[1]) <= 0) {
                 return input;
-            }
-            int[] result = new int[2];
-            result[0] = input[1];
-            result[1] = input[0];
-            return result;
+            } else {
+                 swap(input, 0, 1);
+                 return input;
+             }
         } else {
-            int pivot = input[(start + end) / 2];
+            T pivot = input[(start + end) / 2];
             int i = start;
             int j = end;
             while(i <= j) {
-                while (input[i] < pivot) i++;
-                while (input[j] > pivot) j--;
+                while (input[i].compareTo(pivot) < 0) i++;
+                while (input[j].compareTo(pivot) > 0) j--;
                 if(i <= j) {
                     swap(input, i, j);
                     i++;
@@ -48,8 +47,8 @@ public class Sorter {
         return input;
     }
 
-    private void swap(int[] input, int i , int j) {
-        int temp = input[i];
+    private void swap(T[] input, int i , int j) {
+        T temp = input[i];
         input[i] = input[j];
         input[j] = temp;
     }
